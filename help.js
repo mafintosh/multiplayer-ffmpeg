@@ -50,7 +50,7 @@ function createServer (dir) {
             console.log(peer + ': ' + bytes + ' bytes')
           }
 
-          fs.writeFile(path.join(dir, chunk + '.ts'), Buffer.concat(buf), function () {
+          fs.writeFile(path.join(dir, chunk + '.ts'), wholeBuf, function () {
             res.end()
           })
         })
