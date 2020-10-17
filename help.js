@@ -9,7 +9,11 @@ else createHelper(process.argv[2], Number(process.argv[3]))
 
 function createServer (dir) {
   const chunks = fs.readdirSync(dir).filter(name => name.endsWith('.seg'))
-  const all = cors()
+  const all = cors({
+    methods: ['PUT', 'GET'],
+    allowedHeaders: ['X-Chunk'],
+    exposedHeaders: ['X-Chunk']
+  })
   const contributors = {}
   const server = http.createServer(function (req, res) {
     all(req, res, function () {
