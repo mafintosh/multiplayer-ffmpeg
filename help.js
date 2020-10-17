@@ -10,6 +10,7 @@ else createHelper(process.argv[2], Number(process.argv[3]))
 function createServer (dir) {
   const chunks = fs.readdirSync(dir).filter(name => name.endsWith('.seg'))
   const all = cors()
+  const contributors = {}
   const server = http.createServer(function (req, res) {
     all(req, res, function () {
       if (req.method === 'GET') {
@@ -35,6 +36,15 @@ function createServer (dir) {
         req.on('end', function () {
           const chunk = req.headers['x-chunk']
           if (!chunk) return res.end()
+
+          const address = contributors[req.socket.remoteAddress]
+          contributors[address] = chunk.byteLength + (contributors[address] | 0)
+
+          console.log('Writing chunk', chunk)
+          for (let [peer, bytes] of Object.entries(contributors)) {
+            console.log(peer + ': ' + bytes + ' bytes')
+          }
+
           console.log('Writing chunk', chunk)
           fs.writeFile(path.join(dir, chunk + '.ts'), Buffer.concat(buf), function () {
             res.end()
