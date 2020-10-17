@@ -41,15 +41,15 @@ function createServer (dir) {
           const chunk = req.headers['x-chunk']
           if (!chunk) return res.end()
 
-          const address = contributors[req.socket.remoteAddress]
-          contributors[address] = chunk.byteLength + (contributors[address] | 0)
+          const wholeBuf = Buffer.concat(buf)
+          const address = req.socket.remoteAddress
+          contributors[address] = wholeBuf.byteLength + (contributors[address] || 0)
 
           console.log('Writing chunk', chunk)
           for (let [peer, bytes] of Object.entries(contributors)) {
             console.log(peer + ': ' + bytes + ' bytes')
           }
 
-          console.log('Writing chunk', chunk)
           fs.writeFile(path.join(dir, chunk + '.ts'), Buffer.concat(buf), function () {
             res.end()
           })
